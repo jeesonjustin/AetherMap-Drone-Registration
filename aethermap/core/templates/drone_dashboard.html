@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Drone User Dashboard - AetherMap{% endblock %}
+{% block content %}
+
+<!-- Hero / Welcome Section -->
+<section class="hero">
+    <div class="container hero-wrap">
+        <div>
+            <h1>Welcome, {{ user.username }} 👋</h1>
+            <p class="muted">Your personalized drone dashboard to manage flights, certificates, and compliance.</p>
+            <div class="hero-cta">
+                <a href="#my-drones" class="btn btn-primary">📋 My Drones</a>
+                <a href="#requests" class="btn btn-ghost">✈️ Flight Requests</a>
+                <a href="#map" class="btn btn-ghost">🗺️ View Zones</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- My Drones Section -->
+<section id="my-drones">
+    <div class="container">
+        <h2 class="section-title">My Drones</h2>
+        <p class="section-sub">Registered drones linked to your account.</p>
+
+        <div class="grid grid-2">
+            <!-- Example drone card -->
+            <article class="card">
+                <h3>DJI Phantom 4</h3>
+                <p class="muted">Registration ID: DRN12345</p>
+                <p>Status: <span class="chip">Active</span></p>
+                <div class="hero-cta">
+                    <a href="#" class="btn btn-primary">Request Flight</a>
+                    <a href="#" class="btn btn-ghost">View Certificate</a>
+                </div>
+            </article>
+            <article class="card">
+                <h3>Parrot Anafi</h3>
+                <p class="muted">Registration ID: DRN67890</p>
+                <p>Status: <span class="chip">Pending Approval</span></p>
+                <div class="hero-cta">
+                    <a href="#" class="btn btn-ghost">Track Request</a>
+                </div>
+            </article>
+        </div>
+
+        <div class="cta-band" style="margin-top:16px">
+            <h3 style="margin-top:0">Want to add a new drone?</h3>
+            <a href="#" class="btn btn-primary">➕ Register Drone</a>
+        </div>
+    </div>
+</section>
+
+<!-- Flight Requests & Certificates -->
+<section id="requests">
+    <div class="container">
+        <h2 class="section-title">My Flight Requests</h2>
+        <p class="section-sub">Track approvals, certificates, and renewal dates.</p>
+
+        <div class="card">
+            <table style="width:100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Drone</th>
+                        <th>Zone</th>
+                        <th>Status</th>
+                        <th>Certificate</th>
+                        <th>Renewal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DJI Phantom 4</td>
+                        <td>Green Zone</td>
+                        <td><span class="chip">Approved</span></td>
+                        <td><a href="#">Download</a></td>
+                        <td>2025-12-10</td>
+                    </tr>
+                    <tr>
+                        <td>Parrot Anafi</td>
+                        <td>Red Zone</td>
+                        <td><span class="chip">Pending</span></td>
+                        <td>–</td>
+                        <td>–</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Drone Zone Map -->
+<section id="map">
+    <div class="container">
+        <h2 class="section-title">Drone Zone Map</h2>
+        <p class="section-sub">Check real-time allowed (green) and restricted (red) zones.</p>
+        <div class="card" style="padding:0; overflow:hidden">
+            <div class="hero-map" style="height:320px" aria-label="Interactive drone map">
+                <!-- Sample zone highlights -->
+                <span class="zone green" style="left:50%; top:36%; width:120px; height:120px"></span>
+                <span class="zone red" style="left:62%; top:50%; width:90px; height:90px"></span>
+                <span class="zone green" style="left:38%; top:60%; width:80px; height:80px"></span>
+            </div>
+        </div>
+        <div class="hero-cta" style="margin-top:16px">
+            <a href="#" class="btn btn-primary">Explore Full Map</a>
+            <a href="#requests" class="btn btn-ghost">Submit Request</a>
+        </div>
+    </div>
+</section>
+
+<!-- Notifications -->
+<section id="notifications">
+    <div class="container">
+        <h2 class="section-title">Notifications</h2>
+        <p class="section-sub">Stay updated on renewals and admin alerts.</p>
+        <div class="grid grid-2">
+            <div class="card">
+                <p>⚠️ Certificate for <strong>DJI Phantom 4</strong> expires on <strong>2025-12-10</strong>.</p>
+            </div>
+            <div class="card">
+                <p>✅ Your flight request in <strong>Zone 45B</strong> has been approved.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
