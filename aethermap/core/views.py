@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from .forms import SignUpForm
-from .models import CustomUser
+from .models import CustomUser, Role
 
 
 def index_view(request):
@@ -23,25 +23,21 @@ def login_view(request):
             login(request, user)
             messages.success(request, f"Welcome back {username} 👋")
 
-            # Redirect based on role (stored in CustomUser)
-            try:
-                profile = user.profile
-                if profile.role == "farmer":
-                    return redirect("farmer_dashboard")
-                elif profile.role == "service_provider":
-                    return redirect("service_provider_dashboard")
-                elif profile.role == "drone_user":
-                    return redirect("drone_user_dashboard")
-                else:
-                    return redirect("home")
-            except CustomUser.DoesNotExist:
+            # ✅ Role-based redirect
+            if user.role and user.role.name == "Farmers":
+                return redirect("farmer_dashboard")
+            elif user.role and user.role.name == "service_provider":
+                return redirect("service_provider_dashboard")
+            elif user.role and user.role.name == "drone_user":
+                return redirect("drone_user_dashboard")
+            else:
                 return redirect("home")
 
         else:
             messages.error(request, "Invalid username or password")
             return redirect("login")
-
-    return render(request, "login.html")
+    else:
+        return render(request, "login.html")
 
 
 def signup_view(request):
@@ -50,7 +46,15 @@ def signup_view(request):
         email = request.POST.get("email", "").strip()
         password1 = request.POST.get("password1", "")
         password2 = request.POST.get("password2", "")
-        role = request.POST.get("role", "").strip()
+        # role = request.POST.get("role", "").strip()
+        role = request.POST.get("role").strip()
+        print('role:', role)
+        # Fetch the role instance from the Role table
+        try:
+            role_instance = Role.objects.get(name=role)
+        except Role.DoesNotExist:
+            messages.error(request, "Selected role does not exist.")
+            return redirect("signup")
 
         # ✅ Required fields
         if not all([username, email, password1, password2, role]):
@@ -70,29 +74,28 @@ def signup_view(request):
             return redirect("signup")
 
         # ✅ Username uniqueness
-        if User.objects.filter(username=username).exists():
+        if CustomUser.objects.filter(username=username).exists():
             messages.error(request, "Username already exists.")
             return redirect("signup")
 
         # ✅ Email uniqueness
-        if User.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email=email).exists():
             messages.error(request, "Email already registered.")
             return redirect("signup")
 
         # ✅ Role check
-        if role not in ["drone_user", "service_provider", "farmer"]:
-            messages.error(request, "Invalid role selected.")
-            return redirect("signup")
+        # if role not in ["drone_user", "service_provider", "farmer"]:
+        #     messages.error(request, "Invalid role selected.")
+        #     return redirect("signup")
 
         # ✅ Create User
-        user = User.objects.create_user(
+        user = CustomUser.objects.create_user(
             username=username,
             email=email,
-            password=password1
+            password=password1,
+            role=role_instance
         )
 
-        # ✅ Create CustomUser
-        CustomUser.objects.create(user=user, role=role)
 
         messages.success(request, "Account created successfully! Please log in.")
         return redirect("login")
@@ -106,3 +109,6 @@ def logout_view(request):
 
 def drone_dashboard(request):
     return render(request, "drone_dashboard.html")
+
+def service_provider_dashboard(request):
+    return render(request, "service_provider.html")
