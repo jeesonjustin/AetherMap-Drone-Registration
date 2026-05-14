@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ provider.company_name }}</h2>
+    <p><strong>License No:</strong> {{ provider.license_number }}</p>
+    <p><strong>Service Area:</strong> {{ provider.service_area }}</p>
+    <hr>
+    <h4>Services Provided</h4>
+    {% if services %}
+    <table class="table table-bordered mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Tags</th>
+                <th>Price</th>
+                <th>Available</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in services %}
+            <tr>
+                <td>{{ s.title }}</td>
+                <td>{{ s.description|truncatewords:15 }}</td>
+                <td>{{ s.tags }}</td>
+                <td>₹{{ s.price }}</td>
+                <td>{% if s.availability %}✅{% else %}❌{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">No services registered yet.</p>
+    {% endif %}
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary mt-3">Back</a>
+</div>
+{% endblock %}

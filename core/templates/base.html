@@ -1,0 +1,384 @@
+<!-- base.html page -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}AetherMap{% endblock %}</title>
+
+    <!-- ✅ Global CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+<style>
+    :root {
+        --primary: #2563eb;
+        /* blue */
+        --primary-700: #1d4ed8;
+        --green: #16a34a;
+        --red: #dc2626;
+        --bg: #f8fafc;
+        /* soft cool white background */
+        --card: #ffffff;
+        /* card stands out slightly */
+        --muted: #6b7280;
+        /* gray-500 */
+        --text: #111827;
+        /* almost black text */
+        --white: #ffffff;
+        --maxw: 1200px;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        --radius: 18px;
+    }
+
+    * {
+        box-sizing: border-box
+    }
+
+    html {
+        scroll-behavior: smooth
+    }
+
+
+
+    body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial;
+        color: var(--text);
+
+        /* Subtle gradient background for depth */
+        background: radial-gradient(1200px 600px at 80% -10%, rgba(37, 99, 235, 0.05), transparent 60%),
+            radial-gradient(800px 500px at 10% 0%, rgba(34, 197, 94, 0.05), transparent 50%),
+            linear-gradient(180deg, #f1f1f1, #f1f5f9);
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none
+    }
+
+    .container {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 20px
+    }
+
+    /* Header */
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        backdrop-filter: saturate(180%) blur(8px);
+        background: rgba(255, 255, 255, 0.8);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 0
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        color: var(--primary-700);
+    }
+
+    .brand-logo {
+        display: inline-grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary), #60a5fa)
+    }
+
+    .brand-logo svg {
+        width: 22px;
+        height: 22px;
+        color: white
+    }
+
+    .links {
+        display: flex;
+        align-items: center;
+        gap: 20px
+    }
+
+    .links a {
+        color: var(--muted);
+        font-weight: 500
+    }
+
+    .links a:hover {
+        color: var(--primary-700)
+    }
+
+    .cta {
+        display: flex;
+        align-items: center;
+        gap: 10px
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-weight: 600;
+        border: 1px solid rgba(0, 0, 0, 0.08)
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+        box-shadow: var(--shadow)
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-700)
+    }
+
+    .btn-ghost {
+        background: transparent;
+        color: var(--text)
+    }
+
+    /* Hero */
+    .hero {
+        padding: 72px 0 32px
+    }
+
+    .hero-wrap {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 32px;
+        align-items: center
+    }
+
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary-700);
+        font-weight: 600;
+        background: rgba(37, 99, 235, 0.08);
+        border: 1px solid rgba(37, 99, 235, 0.2);
+        padding: 6px 10px;
+        border-radius: 999px
+    }
+
+    .hero h1 {
+        font-size: 48px;
+        line-height: 1.05;
+        margin: 16px 0 12px
+    }
+
+    .hero p {
+        color: var(--muted);
+        font-size: 18px
+    }
+
+    .hero-cta {
+        margin-top: 22px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap
+    }
+
+    .hero-card {
+        background: linear-gradient(180deg, #ffffff, #f9fafb);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: var(--radius);
+        padding: 18px;
+        box-shadow: var(--shadow)
+    }
+
+    .hero-map {
+        height: 380px;
+        border-radius: 22px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 1px, transparent 1px, transparent 28px),
+            repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 1px, transparent 1px, transparent 28px),
+            linear-gradient(180deg, #f9fafb, #f3f4f6);
+    }
+
+    .zone {
+        position: absolute;
+        border-radius: 1000px;
+        filter: blur(0.4px)
+    }
+
+    .zone.green {
+        background: rgba(34, 197, 94, 0.25);
+        border: 1px solid rgba(34, 197, 94, 0.5)
+    }
+
+    .zone.red {
+        background: rgba(239, 68, 68, 0.25);
+        border: 1px solid rgba(239, 68, 68, 0.5)
+    }
+
+    /* Sections */
+    section {
+        padding: 64px 0
+    }
+
+    .section-title {
+        font-size: 28px;
+        margin: 0 0 10px;
+        letter-spacing: 0.2px;
+        color: var(--text);
+    }
+
+    .section-sub {
+        color: var(--muted);
+        margin-bottom: 26px
+    }
+
+    .grid {
+        display: grid;
+        gap: 18px
+    }
+
+    .grid-3 {
+        grid-template-columns: repeat(3, 1fr)
+    }
+
+    .grid-4 {
+        grid-template-columns: repeat(4, 1fr)
+    }
+
+    .card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow)
+    }
+
+    .card h3 {
+        margin: 6px 0
+    }
+
+    .muted {
+        color: var(--muted)
+    }
+
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: #f9fafb;
+    }
+
+    /* CTA band */
+    .cta-band {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(34, 197, 94, 0.1));
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 22px;
+        padding: 26px;
+        text-align: center;
+        box-shadow: var(--shadow)
+    }
+
+    /* Footer */
+    footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        padding: 28px 0 40px;
+        background: #f9fafb;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 20px
+    }
+
+    .footer-col a {
+        display: block;
+        color: var(--muted);
+        margin: 6px 0
+    }
+
+    .copyright {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 18px
+    }
+</style>
+
+
+<body> <!-- ✅ Navbar (common) -->
+    <header>
+        <div class="container nav"> <a href="{% url 'index' %}" class="brand">
+                <span class="brand-logo"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8h6M15 8h6M12 15v6M9 21h6" />
+                        <circle cx="12" cy="10.5" r="2.5" />
+                    </svg> </span> <span>AetherMap</span> </a>
+            <nav class="links"> <a href="#roles">Roles</a> <a href="#map">Drone Zones</a> <a href="#how">How it
+                    works</a> <a href="#services">Services</a> <a href="#about">About</a> <a href="#contact">Contact</a>
+            </nav>
+            {% if user.is_authenticated %}
+            <!-- Show Logout -->
+            <div class="cta">
+                <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a>
+            </div>
+            {% else %}
+            <!-- Show Login + Signup -->
+            <div class="cta">
+                <a class="btn btn-ghost" href="{% url 'login' %}">Login</a>
+                <a class="btn btn-primary" href="{% url 'signup' %}">Sign Up</a>
+            </div>
+            {% endif %}
+
+
+        </div>
+    </header>
+    <!-- ✅ Page-specific content goes here -->
+    <main> {% block content %}{% endblock %} </main>
+    <!-- ✅ Footer (common) -->
+    <footer>
+        <div class="container footer-grid">
+            <div>
+                <div class="brand"> <span class="brand-logo"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 8h6M15 8h6M12 15v6M9 21h6" />
+                            <circle cx="12" cy="10.5" r="2.5" />
+                        </svg> </span> <span>AetherMap</span> </div>
+                <p class="muted">A unified portal for drone users, service providers, and farmers.</p>
+                <p class="copyright">© 2025 AetherMap. All rights reserved.</p>
+            </div>
+            <div class="footer-col"> <strong>Product</strong> <a href="#roles">Roles</a> <a href="#map">Drone Zones</a>
+                <a href="#services">Services</a> <a href="#how">How it works</a>
+            </div>
+            <div class="footer-col"> <strong>Company</strong> <a href="#about">About</a> <a href="#contact">Contact</a>
+            </div>
+            <div class="footer-col"> <strong>Account</strong> <a href="#login">Login</a> <a href="#signup">Sign Up</a>
+            </div>
+        </div>
+    </footer> <!-- ✅ Global JS -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/script.js' %}"></script> {% block extra_js %}{% endblock %}
+</body>
+
+</html>

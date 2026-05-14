@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Edit Provider: {{ provider.company_name }}</h3>
+    <form method="POST" class="mt-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary mt-2">Update</button>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary mt-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

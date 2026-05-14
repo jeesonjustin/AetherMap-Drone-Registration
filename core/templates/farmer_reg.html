@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Farmer Registration | AetherMap{% endblock %}
+
+{% block content %}
+<style>
+    .form-section {
+        padding: 60px 0;
+    }
+
+    .form-card {
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        padding: 2.5rem;
+    }
+
+    .form-heading {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1d4ed8;
+        border-left: 4px solid #2563eb;
+        padding-left: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 12px;
+        padding: 10px 16px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .submit-btn {
+        background: #2563eb;
+        color: #fff;
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        border: none;
+    }
+
+    .submit-btn:hover {
+        background: #1d4ed8;
+    }
+</style>
+
+<section class="form-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="text-center mb-5">
+                    <h1 class="section-title">👩‍🌾 Farmer Registration</h1>
+                    <p class="section-sub">Register as a farmer to request drone-based agricultural services.</p>
+                </div>
+                <form method="POST" class="form-card">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <h3 class="form-heading">Farmer Details</h3>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.name.label }}</label>
+                            {{ form.name }}
+                            <div class="text-danger">{{ form.name.errors }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            <div class="text-danger">{{ form.email.errors }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                            <div class="text-danger">{{ form.phone.errors }}</div>
+                        </div>
+                    </div>
+
+                    <h3 class="form-heading">Field & Crop Details</h3>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.crop_type.label }}</label>
+                            {{ form.crop_type }}
+                            <div class="text-danger">{{ form.crop_type.errors }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.field_size.label }}</label>
+                            {{ form.field_size }}
+                            <div class="text-danger">{{ form.field_size.errors }}</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ form.location.label }}</label>
+                            {{ form.location }}
+                            <div class="text-danger">{{ form.location.errors }}</div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <div class="d-grid">
+                        <button type="submit" class="btn submit-btn btn-lg">Register Farmer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

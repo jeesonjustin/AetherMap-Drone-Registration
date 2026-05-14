@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Drone User Dashboard - AetherMap{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div class="container hero-wrap">
+        <div>
+            <h1>Welcome, {{ user.username }} </h1>
+            <p class="muted">Your personalized drone dashboard to manage registrations and view application statuses.
+            </p>
+            <div class="hero-cta">
+                <a href="{% url 'drone_registration' %}" class="btn btn-primary">➕ Register a New Drone</a>
+                <a href="#my-registrations" class="btn btn-ghost">View My Registrations</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="my-registrations">
+    <div class="container">
+        <h2 class="section-title">My Drone Registrations</h2>
+        <p class="section-sub">Track the approval status of your submitted applications below.</p>
+
+        {% if registrations %}
+        <div class="card">
+            <table style="width:100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <th style="padding: 12px;">Drone Model</th>
+                        <th style="padding: 12px;">Submitted On</th>
+                        <th style="padding: 12px;">Status</th>
+                        <th style="padding: 12px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in registrations %}
+                    <tr>
+                        <td style="padding: 12px;">{{ reg.drone_model }}</td>
+                        <td style="padding: 12px;">{{ reg.created_at|date:"d M, Y" }}</td>
+                        <td style="padding: 12px;">
+                            <span class="chip status-{{ reg.application_status|lower }}">
+                                {{ reg.application_status }}
+                            </span>
+                        </td>
+                        <td style="padding: 12px;">
+                            <!-- {% if reg.application_status == 'Approved' and reg.certificate_file %}
+                            <a href="{{ reg.certificate_file.url }}" class="btn btn-primary btn-sm"
+                                target="_blank">Download Certificate</a>
+                            {% else %}
+                            <span>-</span>
+                            {% endif %} -->
+                            {% if reg.application_status == 'Approved' %}
+                            <a href="{% url 'download_drone_pdf' reg.id %}" target="_blank" class="btn btn-primary">
+                                Download Certificate
+                            </a>
+                            {% elif reg.application_status == "Rejected" %}
+                            <span class="text-danger">Rejected ❌</span>
+                            {% else %}
+                            <span class="text-muted">Awaiting Approval ⏳</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="cta-band" style="text-align: center;">
+            <h3 style="margin-top:0;">You haven't registered any drones yet.</h3>
+            <p class="muted">Click the button below to submit your first drone for approval.</p>
+            <div class="hero-cta" style="justify-content:center; margin-top:16px;">
+                <a href="{% url 'drone_registration' %}" class="btn btn-primary">Register Your First Drone</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .status-pending {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #b48b05;
+    }
+
+    .status-approved {
+        background-color: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+    }
+
+    .status-rejected {
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+    }
+</style>
+
+{% endblock %}

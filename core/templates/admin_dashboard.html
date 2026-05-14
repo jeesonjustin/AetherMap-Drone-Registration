@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-700: #1d4ed8;
+            --green: #16a34a;
+            --red: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --muted: #6b7280;
+            --text: #111827;
+            --white: #ffffff;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --radius: 18px;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial, sans-serif;
+            color: var(--text);
+            background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: #1e293b;
+            color: var(--white);
+            padding: 20px 0;
+            width: 240px;
+        }
+
+        .sidebar h4 {
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #cbd5e1;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .sidebar a.active,
+        .sidebar a:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .sidebar a i {
+            margin-right: 10px;
+        }
+
+        .topbar {
+            background: var(--card);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .card-custom {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-custom h3 {
+            margin: 8px 0;
+            font-size: 28px;
+            color: var(--primary-700);
+        }
+
+        .table-custom {
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            background: var(--card);
+        }
+
+        .table thead {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .status {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            color: #856404;
+            background: #fff3cd;
+        }
+
+        .status-approved {
+            color: #155724;
+            background: #d4edda;
+        }
+
+        .status-rejected {
+            color: #721c24;
+            background: #f8d7da;
+        }
+
+        .btn-action {
+            padding: 4px 10px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            margin: 0 2px;
+            color: #fff;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-approve {
+            background: #17a2b8;
+        }
+
+        .btn-reject {
+            background: #dc3545;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                display: flex;
+                justify-content: space-around;
+                z-index: 1000;
+            }
+
+            .sidebar a {
+                flex: 1;
+                text-align: center;
+                padding: 10px 0;
+            }
+
+            .topbar {
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex">
+        <div class="sidebar">
+            <h4 class="text-center">Admin Panel</h4>
+            <a onclick="showSection('dashboard')" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <h4 class="text-center" style="margin-bottom: 0px!important; padding: 12px;">Registrations</h4>
+            <a onclick="showSection('users')"><i class="bi bi-people"></i> Drone Users</a>
+            <a onclick="showSection('providers')"><i class="bi bi-briefcase"></i> Service Providers</a>
+            <a onclick="showSection('farmers')"><i class="bi bi-tree"></i> Farmers</a>
+            <a href="/admin/" target="_blank"><i class="bi bi-gear"></i> Site Admin</a>
+        </div>
+
+        <div class="flex-grow-1">
+            <div class="topbar">
+                <h5 class="m-0"> Dashboard</h5>
+                <div>
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Logout</a>
+                </div>
+            </div>
+
+            <div id="dashboard-section" class="container my-4">
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="card-custom">
+                            <h6>Total Users</h6>
+                            <h3>{{ total_users }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card-custom">
+                            <h6>Drone Users</h6>
+                            <h3>{{ drone_users }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card-custom">
+                            <h6>Farmers</h6>
+                            <h3>{{ farmers }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card-custom">
+                            <h6>Service Providers</h6>
+                            <h3>{{ providers }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-custom mt-4">
+                    <table class="table table-hover m-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Date Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in all_users %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.role.name|title }}</td>
+                                <td>{{ user.date_joined|date:"Y-m-d" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No users found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="users-section" class="container my-4" style="display:none;">
+                <h2> Drone Registration Management</h2>
+                <div class="table-custom mt-3">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Applicant Name</th>
+                                <th>Drone Model</th>
+                                <!-- <th>Validation Status</th> -->
+                                <th>Submitted On</th>
+                                <th>Final Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reg in drone_registrations %}
+                            <tr data-id="{{ reg.id }}">
+                                <td>{{ reg.id }}</td>
+                                <td>{{ reg.full_name }}</td>
+                                <td>{{ reg.drone_model }}</td>
+                                <!-- <td title="{{ reg.validation_notes }}">
+                                    <span
+                                        class="status 
+                                        {% if reg.pre_approval_status == 'Checks Passed' %}status-approved{% elif reg.pre_approval_status == 'Checks Failed' %}status-rejected{% else %}status-pending{% endif %}">
+                                        {{ reg.pre_approval_status }}
+                                    </span>
+                                </td> -->
+                                <td>{{ reg.created_at|date:"Y-m-d" }}</td>
+                                <!-- <td><span class="status status-{{ reg.application_status|lower }}">{{
+                                        reg.application_status }}</span></td> -->
+                                <td title="{{ reg.application_status }}">
+                                    <span
+                                        class="status 
+                                        {% if reg.application_status == 'Approved' %}status-approved{% elif reg.application_status == 'Rejected' %}status-rejected{% else %}status-pending{% endif %}">
+                                        {{ reg.application_status }}
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    {% if reg.application_status == "Approved" %}
+                                    {% if reg.certificate_file %}
+                                    <button class="btn btn-secondary"
+                                        onclick="previewCertificate('{{ reg.certificate_file.url }}')">
+                                        Preview Certificate
+                                    </button>
+                                    <span class="badge bg-success">Certificate Generated ✅</span>
+                                    {% else %}
+                                    <button class="btn-action btn-approve"><a
+                                            href="{% url 'download_drone_pdf' reg.id %}" target="_blank">
+                                            Download Certificate
+                                        </a></button>
+                                    {% endif %}
+                                    {% elif reg.application_status == "Rejected" %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                    {% else %}
+                                    <!-- <span class="badge bg-warning">Pending ⏳</span> -->
+                                    <button class="btn-action btn-approve"
+                                        onclick="generateCertificate('{{ reg.id }}')">Approve</button>
+                                    <button class="btn-action btn-reject"
+                                        onclick="updateStatus(this, 'Rejected', '{{ reg.id }}')">Reject</button>
+                                    {% endif %}
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">No drone registrations found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!-- 🔽 Place this only ONCE below your table -->
+                    <div class="modal fade" id="previewModal" tabindex="-1">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Certificate Preview</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <iframe id="certificateFrame" src="" width="100%" height="600px"
+                                        style="border:none;"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 🟩 Service Providers Section -->
+            <div id="providers-section" class="container my-4" style="display:none;">
+                <h2>Service Providers Management</h2>
+                <div class="table-custom mt-3">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Provider Name</th>
+                                <th>Email</th>
+                                <th>Service Count</th>
+                                <th>Registered On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for provider in service_providers %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ provider.provider_name }}</td>
+                                <td>{{ provider.email }}</td>
+                                <td>{{ provider.service_count }}</td>
+                                <td>{{ provider.registered_on|date:"Y-m-d" }}</td>
+                                <td>
+                                    <a href="{% url 'provider_detail' provider.id %}"
+                                        class="btn btn-sm btn-info">View</a>
+                                    <a href="{% url 'edit_provider' provider.id %}"
+                                        class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="{% url 'delete_provider' provider.id %}" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Are you sure you want to delete this provider?');">Delete</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No service providers found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- 🟨 Farmers Section -->
+            <div id="farmers-section" class="container my-4" style="display:none;">
+                <h2>Farmers Registration Management</h2>
+                <div class="table-custom mt-3">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Farmer Name</th>
+                                <th>Email</th>
+                                <th>Location</th>
+                                <th>Registered On</th>
+                                <th>Request Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td>svbxvnb</td>
+                                <td>zdghbnc</td>
+                                <td>Sfdghc</td>
+                                <td>xcvbn</td>
+                                <td>nm,</td>
+                                <td>
+                                    <span class="status 
+                            {% if farmer.request_status == 'Approved' %}status-approved
+                            {% elif farmer.request_status == 'Rejected' %}status-rejected
+                            {% else %}status-pending{% endif %}">
+                                        {{ farmer.request_status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn-action btn-approve"
+                                        onclick="updateFarmerStatus('{{ farmer.id }}', 'Approved')">Approve</button>
+                                    <button class="btn-action btn-reject"
+                                        onclick="updateFarmerStatus('{{ farmer.id }}', 'Rejected')">Reject</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="7" class="text-center">No farmer registrations found.</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div>
+            </div>
+
+            <script>
+                function previewCertificate(fileUrl) {
+                    document.getElementById("certificateFrame").src = fileUrl;
+                    let modal = new bootstrap.Modal(document.getElementById('previewModal'));
+                    modal.show();
+                }
+            </script>
+
+            <script>
+                function showSection(section) {
+                    // Hide all sections
+                    document.getElementById("dashboard-section").style.display = "none";
+                    document.getElementById("users-section").style.display = "none";
+                    document.getElementById("providers-section").style.display = "none";
+                    document.getElementById("farmers-section").style.display = "none";
+
+                    // Show the selected one
+                    document.getElementById(`${section}-section`).style.display = "block";
+
+                    // Sidebar active state
+                    const activeLink = document.querySelector('.sidebar a.active');
+                    if (activeLink) activeLink.classList.remove('active');
+                    const newActive = document.querySelector(`.sidebar a[onclick="showSection('${section}')"]`);
+                    if (newActive) newActive.classList.add('active');
+                }
+
+                // This function is now ONLY for rejecting an application
+                function updateStatus(button, status, registrationId) {
+                    const csrfToken = '{{ csrf_token }}';
+                    fetch(`/dashboard/update_status/${registrationId}/`, {
+                        method: "POST",
+                        headers: { "X-CSRFToken": csrfToken, "Content-Type": "application/json" },
+                        body: JSON.stringify({ status: status })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert("Application status updated to " + data.new_status);
+                                let row = button.closest("tr");
+                                let statusCell = row.querySelector(".status-" + status.toLowerCase());
+                                statusCell.textContent = data.new_status;
+                            } else {
+                                alert("Error: " + data.error);
+                            }
+                        });
+                }
+
+                function generateCertificate(registrationId) {
+                    let button = document.querySelector(`tr[data-id="${registrationId}"] .btn-approve`);
+                    button.textContent = 'Generating...';
+                    button.disabled = true;
+
+                    fetch(`/dashboard/generate-certificate/${registrationId}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}",
+                            "Content-Type": "application/json",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify({ status: "Approved" })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert("Successfully Approved!");
+                                let row = button.closest("tr");
+
+                                // Update status to Approved
+                                let statusCell = row.querySelector(".status-pending");
+                                if (statusCell) {
+                                    statusCell.textContent = "Approved";
+                                    statusCell.className = "status status-approved";
+                                }
+
+                                // Replace buttons with download link
+
+                            } else {
+                                alert("Error: " + data.error);
+                                button.textContent = "Approve & Gen. Cert.";
+                                button.disabled = false;
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Fetch Error:", error);
+                            alert("An unexpected server error occurred.");
+                            button.textContent = "Approve & Gen. Cert.";
+                            button.disabled = false;
+                        });
+                }
+
+
+
+
+            </script>
+            <script>
+                function getCookie(name) {
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+            </script>
+
+</body>
+
+</html>
+
+<!-- .then(response => response.json())
+.then(data => {
+console.log("RAW RESPONSE:", data);
+try {
+const json = JSON.parse(data);
+console.log("PARSED JSON:", json);
+} catch (e) {
+console.error("Not JSON, got HTML instead", e);
+}
+if (data.success) {
+alert('Certificate generated successfully!');
+let row = button.closest('tr');
+
+// Update status to "Approved"
+let statusCell = row.querySelector('.status-pending'); // Find the main status cell
+if (statusCell) {
+statusCell.textContent = 'Approved';
+statusCell.className = 'status status-approved';
+}
+
+// Replace the buttons with a "Download" link
+let actionCell = button.parentElement;
+actionCell.innerHTML = `< a href="${data.file_url}" class="btn-action btn-success" target="_blank"> Download</a>`;
+
+    } else {
+    alert('Could not generate certificate:\n' + data.error);
+    button.textContent = 'Approve & Gen. Cert.';
+    button.disabled = false;
+    }
+    }) -->
+
+<!-- function generateCertificate(registrationId) {
+let button = document.querySelector(`tr[data-id="${registrationId}"] .btn-approve`);
+button.textContent = 'Generating...';
+button.disabled = true;
+
+fetch(`/dashboard/generate-certificate/${registrationId}/`, {
+method: "POST",
+headers: {
+"X-CSRFToken": "{{ csrf_token }}",
+"Content-Type": "application/json",
+"Accept": "application/json"
+},
+body: JSON.stringify({ status: "Approved" })
+})
+.then(res => res.json())
+.then(data => {
+if (data.success) {
+alert("Certificate generated successfully!");
+let row = button.closest("tr");
+
+// Update status to Approved
+let statusCell = row.querySelector(".status-pending");
+if (statusCell) {
+statusCell.textContent = "Approved";
+statusCell.className = "status status-approved";
+}
+
+// Replace buttons with download link
+let actionCell = button.parentElement;
+actionCell.innerHTML = `<a href="${data.file_url}" class="btn-action btn-success" target="_blank">Download</a>`;
+} else {
+alert("Error: " + data.error);
+button.textContent = "Approve & Gen. Cert.";
+button.disabled = false;
+}
+})
+.catch(error => {
+console.error("Fetch Error:", error);
+alert("An unexpected server error occurred.");
+button.textContent = "Approve & Gen. Cert.";
+button.disabled = false;
+});
+} -->
+<!-- function generateCertificate(registrationId) {
+let btn = document.querySelector(`button[onclick*="${registrationId}"]`);
+btn.textContent = 'Generating...';
+btn.disabled = true;
+
+fetch(`/dashboard/generate-certificate/${registrationId}/`, {
+method: "POST",
+headers: {
+"X-CSRFToken": "{{ csrf_token }}",
+"Accept": "application/json"
+}
+})
+.then(res => res.json())
+.then(data => {
+if (data.success) {
+btn.closest("td").innerHTML = `
+<button class="btn btn-secondary" onclick="previewCertificate('${data.file_url}')">
+    Preview Certificate
+</button>
+<span class="badge bg-success">Certificate Generated ✅</span>
+`;
+} else {
+alert("Error: " + data.error);
+btn.textContent = 'Generate Certificate';
+btn.disabled = false;
+}
+})
+.catch(err => {
+console.error(err);
+btn.textContent = 'Generate Certificate';
+btn.disabled = false;
+});
+} -->

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Service Provider Dashboard - AetherMap{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container hero-wrap">
+        <div>
+            <h1>Welcome, {{ user.username }}</h1>
+            <p class="muted">Manage your drone services, respond to farmer requests, and track your activity.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Stats -->
+<section class="stats">
+    <div class="container grid grid-4">
+        <div class="card">
+            <h3>{{ total_requests }}</h3>
+            <p class="muted">Total Requests</p>
+        </div>
+        <div class="card">
+            <h3>{{ pending_requests }}</h3>
+            <p class="muted">Pending</p>
+        </div>
+        <div class="card">
+            <h3>{{ approved_requests }}</h3>
+            <p class="muted">Approved</p>
+        </div>
+        <div class="card">
+            <h3>{{ completed_requests }}</h3>
+            <p class="muted">Completed</p>
+        </div>
+    </div>
+</section>
+
+<!-- Farmer Requests Feed -->
+<section id="requests">
+    <div class="container">
+        <h2 class="section-title">Farmer Requests</h2>
+        <p class="section-sub">New service requests from farmers.</p>
+        <div class="grid grid-2">
+            {% for request in farmer_requests %}
+            <div class="card">
+                <h3>{{ request.service_type }}</h3>
+                <p><strong>Crop:</strong> {{ request.crop_type }}</p>
+                <p><strong>Location:</strong> {{ request.location }}</p>
+                <p><strong>Date:</strong> {{ request.date }}</p>
+                <div class="hero-cta">
+                    <a href="{% url 'provider_accept_request' request.id %}" class="btn btn-primary">Verify & Accept</a>
+                    <a href="{% url 'provider_reject_request' request.id %}" class="btn btn-ghost">Reject</a>
+                </div>
+            </div>
+            {% empty %}
+            <p class="muted">No requests yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- My Services -->
+<section id="services">
+    <div class="container">
+        <h2 class="section-title">My Services</h2>
+        <p class="section-sub">Your listed services are visible to farmers.</p>
+
+        <div class="grid grid-3">
+            {% for service in my_services %}
+            <div class="card service">
+                <h3>{{ service.title }}</h3>
+                <p class="muted">{{ service.description }}</p>
+                <div class="tags">
+                    {% for tag in service.tags %}
+                    <span class="chip">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                <p><strong>Price:</strong> ₹{{ service.price }}</p>
+                <p><strong>Availability:</strong> {{ service.availability }}</p>
+
+                <div class="hero-cta" style="margin-top:10px">
+                    <a href="{% url 'edit_service' service.id %}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{% url 'delete_service' service.id %}" class="btn btn-ghost btn-sm">Delete</a>
+                </div>
+            </div>
+            {% empty %}
+            <p class="muted">You haven’t listed any services yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Add Service Button -->
+        <div class="hero-cta" style="margin-top:16px">
+            <a href="{% url 'service_list' %}" class="btn btn-primary">Show services</a>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section id="map">
+    <div class="container">
+        <h2 class="section-title">Request Locations</h2>
+        <p class="section-sub">Visualize farmer request locations on the map.</p>
+        <div class="card" style="padding:0; overflow:hidden">
+            <div class="hero-map" aria-label="Map preview placeholder" style="height:320px">
+                <!-- Map integration will go here -->
+                <span class="zone green" style="left:50%; top:36%; width:100px; height:100px"></span>
+                <span class="zone red" style="left:62%; top:50%; width:80px; height:80px"></span>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

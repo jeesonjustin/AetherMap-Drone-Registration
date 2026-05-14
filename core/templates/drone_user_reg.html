@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Drone Registration | AetherMap{% endblock %}
+
+{% block content %}
+<style>
+    .form-section {
+        padding: 60px 0;
+        background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .form-card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        padding: 2.5rem;
+        max-width: 800px;
+        width: 100%;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-heading {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1d4ed8;
+        border-left: 4px solid #2563eb;
+        padding-left: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 12px;
+        padding: 10px 16px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        font-size: 1rem;
+        background: #f9f9f9;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
+        outline: none;
+        background: #ffffff;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 1rem;
+        color: #374151;
+        transition: color 0.3s ease;
+    }
+
+    .form-label:hover {
+        color: #1d4ed8;
+    }
+
+    .submit-btn {
+        background: #2563eb;
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        border: none;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .submit-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .tooltip {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+        .form-card {
+            padding: 1.5rem;
+        }
+
+        .form-heading {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+
+<section class="form-section">
+    <form method="POST" class="form-card">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <h3 class="form-heading">Personal Details</h3>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <label for="{{ form.full_name.id_for_label }}" class="form-label">{{ form.full_name.label }}</label>
+                {{ form.full_name }}
+                <div class="tooltip">Enter your full legal name.</div>
+                <div class="form-text text-danger">{{ form.full_name.errors }}</div>
+            </div>
+            <div class="col-md-6">
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                {{ form.email }}
+                <div class="tooltip">Provide a valid email address.</div>
+                <div class="form-text text-danger">{{ form.email.errors }}</div>
+            </div>
+            <div class="col-md-6">
+                <label for="{{ form.phone_number.id_for_label }}" class="form-label">{{ form.phone_number.label }}</label>
+                {{ form.phone_number }}
+                <div class="tooltip">Include your country code (e.g., +1).</div>
+                <div class="form-text text-danger">{{ form.phone_number.errors }}</div>
+            </div>
+            <div class="col-md-6">
+                <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">{{ form.date_of_birth.label }}</label>
+                {{ form.date_of_birth }}
+                <div class="tooltip">Format: YYYY-MM-DD.</div>
+                <div class="form-text text-danger">{{ form.date_of_birth.errors }}</div>
+            </div>
+        </div>
+
+        <h3 class="form-heading">Drone Specifications</h3>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <label for="{{ form.drone_model.id_for_label }}" class="form-label">{{ form.drone_model.label }}</label>
+                {{ form.drone_model }}
+                <div class="tooltip">Specify the make and model of your drone.</div>
+                <div class="form-text text-danger">{{ form.drone_model.errors }}</div>
+            </div>
+            <div class="col-md-6">
+                <label for="{{ form.drone_serial_number.id_for_label }}" class="form-label">{{ form.drone_serial_number.label }}</label>
+                {{ form.drone_serial_number }}
+                <div class="tooltip">Enter the unique serial number.</div>
+                <div class="form-text text-danger">{{ form.drone_serial_number.errors }}</div>
+            </div>
+            <div class="col-12">
+                <label for="{{ form.drone_purpose.id_for_label }}" class="form-label">{{ form.drone_purpose.label }}</label>
+                {{ form.drone_purpose }}
+                <div class="tooltip">Describe the intended use of the drone.</div>
+                <div class="form-text text-danger">{{ form.drone_purpose.errors }}</div>
+            </div>
+        </div>
+
+        <h3 class="form-heading">Flight Plan</h3>
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <label for="{{ form.flight_district.id_for_label }}" class="form-label">{{ form.flight_district.label }}</label>
+                {{ form.flight_district }}
+                <div class="tooltip">Select the district of operation.</div>
+                <div class="form-text text-danger">{{ form.flight_district.errors }}</div>
+            </div>
+            <div class="col-md-6">
+                <label for="{{ form.flight_municipality.id_for_label }}" class="form-label">{{ form.flight_municipality.label }}</label>
+                {{ form.flight_municipality }}
+                <div class="tooltip">Choose the municipality.</div>
+                <div class="form-text text-danger">{{ form.flight_municipality.errors }}</div>
+            </div>
+            <div class="col-md-6">
+                <label for="{{ form.flight_start_time.id_for_label }}" class="form-label">{{ form.flight_start_time.label }}</label>
+                {{ form.flight_start_time }}
+                <div class="tooltip">Specify the start time (24-hour format).</div>
+                <div class="form-text text-danger">{{ form.flight_start_time.errors }}</div>
+            </div>
+            <div class="col-md-6">
+                <label for="{{ form.flight_end_time.id_for_label }}" class="form-label">{{ form.flight_end_time.label }}</label>
+                {{ form.flight_end_time }}
+                <div class="tooltip">Specify the end time (24-hour format).</div>
+                <div class="form-text text-danger">{{ form.flight_end_time.errors }}</div>
+            </div>
+            <div class="col-12">
+                <label for="{{ form.flight_reason.id_for_label }}" class="form-label">{{ form.flight_reason.label }}</label>
+                {{ form.flight_reason }}
+                <div class="tooltip">Explain the reason for the flight.</div>
+                <div class="form-text text-danger">{{ form.flight_reason.errors }}</div>
+            </div>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" id="submit-btn" class="btn submit-btn btn-lg" style="margin-top: 20px;">
+                Submit Application for Approval
+            </button>
+        </div>
+    </form>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const districtSelect = document.getElementById("id_flight_district");
+        const municipalitySelect = document.getElementById("id_flight_municipality");
+        const startTimeInput = document.getElementById("id_flight_start_time");
+        const endTimeInput = document.getElementById("id_flight_end_time");
+        const submitBtn = document.getElementById("submit-btn");
+
+        districtSelect.addEventListener("change", function () {
+            const districtId = this.value;
+            municipalitySelect.innerHTML = '<option value="">Loading...</option>';
+            if (!districtId) {
+                municipalitySelect.innerHTML = '<option value="">Select a District First</option>';
+                return;
+            }
+            fetch(`/ajax/load-municipalities/?district_id=${districtId}`)
+                .then(response => response.json())
+                .then(data => {
+                    municipalitySelect.innerHTML = '<option value="">Select a Municipality</option>';
+                    data.forEach(muni => {
+                        const option = document.createElement("option");
+                        option.value = muni.id;
+                        option.textContent = muni.name;
+                        option.dataset.isRedZone = muni.is_red_zone;
+                        municipalitySelect.appendChild(option);
+                    });
+                    municipalitySelect.disabled = false;
+                });
+        });
+
+        municipalitySelect.addEventListener("change", function () {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption && selectedOption.dataset.isRedZone === "true") {
+                alert("This is a Red Zone. You are not allowed to fly drones here.");
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            }
+        });
+
+        startTimeInput.addEventListener("change", function () {
+            if (this.value) {
+                const startDate = new Date(this.value);
+                startDate.setDate(startDate.getDate() + 30); // +30 days
+                const year = startDate.getFullYear();
+                const month = String(startDate.getMonth() + 1).padStart(2, '0');
+                const day = String(startDate.getDate()).padStart(2, '0');
+                const hours = String(startDate.getHours()).padStart(2, '0');
+                const minutes = String(startDate.getMinutes()).padStart(2, '0');
+                endTimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            } else {
+                endTimeInput.value = '';
+            }
+        });
+    });
+</script>
+{% endblock %}
